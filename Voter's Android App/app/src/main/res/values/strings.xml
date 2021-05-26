@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">eVoting App</string>
+    <string name="evoting_app">eVoting App</string>
+    <string name="state">State</string>
+    <string name="district">District</string>
+    <string name="legislative">Legislative</string>
+    <string name="select_state" />
+    <string name="phone_number">Phone Number</string>
+    <string name="send_otp">SEND OTP</string>
+    <string name="Constituency">constituency</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="verify">Verify</string>
+    <string name="candidates">Candidates</string>
+    <string-array name="state_array">
+        <item>Select State</item>
+        <item>Andaman Nicobar</item>
+        <item>Andhra Pradesh</item>
+        <item>Arunachal Pradesh</item>
+        <item>Assam</item>
+        <item>Bihar</item>
+        <item>Chandigarh</item>
+        <item>Chhattisgarh</item>
+        <item>Dadra Nagar Haveli</item>
+        <item>Daman Diu</item>
+        <item>Delhi</item>
+        <item>Goa</item>
+        <item>Gujarat</item>
+        <item>Haryana</item>
+        <item>Himachal Pradesh</item>
+        <item>Jammu Kashmir</item>
+        <item>Jharkhand</item>
+        <item>Karnataka</item>
+        <item>Kerala</item>
+        <item>Ladakh</item>
+        <item>Lakshadweep</item>
+        <item>Madhya Pradesh</item>
+        <item>Maharashtra</item>
+        <item>Manipur</item>
+        <item>Meghalaya</item>
+        <item>Mizoram</item>
+        <item>Nagaland</item>
+        <item>Odisha</item>
+        <item>Puducherry</item>
+        <item>Punjab</item>
+        <item>Rajasthan</item>
+        <item>Sikkim</item>
+        <item>Tamil Nadu</item>
+        <item>Telangana</item>
+        <item>Tripura</item>
+        <item>Uttarakhand</item>
+        <item>Uttar Pradesh</item>
+        <item>West Bengal</item>
+    </string-array>
+</resources>
+
+

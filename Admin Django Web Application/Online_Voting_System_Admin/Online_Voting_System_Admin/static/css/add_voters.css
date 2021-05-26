@@ -1,0 +1,11 @@
+#uploaded_img{
+    width: 200px;
+    height: 175px;
+}
+#add_voters_main_content{
+   margin-left: 60px;
+}
+.navbar_container{
+    height:100%;
+    position: fixed;
+}

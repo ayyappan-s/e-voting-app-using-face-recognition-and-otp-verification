@@ -1,0 +1,58 @@
+<html>
+<head>
+    {% load static %}
+    {% load crispy_forms_tags %}
+    <title>
+        Admin Login
+    </title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+<div class="container py-5">
+  <h1>Login</h1>
+  <form method="POST" id="login_form">
+    {% csrf_token %}
+    {{ login_form|crispy }}
+    <button class="btn btn-primary" type="submit" id="login_btn">Login</button>
+      <div id="output"></div>
+  </form>
+  <p class="text-center">Don't have an account? <a href="/register">Create an account</a>.</p>
+</div>
+
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+
+    $('#login_form').on('submit', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "login_ajax_request"%}',
+            data:{
+                name:$("#id_username").val(),
+                password:$("#id_password").val(),
+                csrfmiddlewaretoken:'{{csrf_token}}',
+                dataType:'json',
+            },
+            success:function (data){
+                $("#output").html(data.msg)
+                if(data.redirect=="yes"){
+                    window.location.href='dashboard'
+                }
+            },
+            failure:function () {
+
+            }
+
+        });
+    });
+
+
+
+</script>
+
+</html>

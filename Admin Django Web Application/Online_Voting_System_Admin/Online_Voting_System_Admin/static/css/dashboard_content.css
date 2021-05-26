@@ -1,0 +1,45 @@
+#dashboard_main_content{
+    margin-left: 60px;
+}
+
+#candimg{
+    width: 125px;
+    height: 125px;
+}
+
+
+.navbar_container{
+    height:100%;
+    position: fixed;
+}
+#candidate_edit_form{
+    float:right;
+}
+#editform{
+    width:100%;
+    height:100%;
+    opacity:.95;
+    top:0;
+    left:60px;
+    display:none;
+    position:fixed;
+    background-color:#313131;
+    overflow:auto
+}
+#candidate_detail{
+    width:100%;
+    height:90%;
+    padding:10px 50px;
+    border:2px solid gray;
+    border-radius:10px;
+    font-family:raleway;
+    background-color:#fff
+}
+#editState,#editDistrict,#editLegislative,#editName{
+    height:30px;
+    width:200px;
+}
+#editImage,#editSymbol{
+    width: 125px;
+    height: 125px;
+}

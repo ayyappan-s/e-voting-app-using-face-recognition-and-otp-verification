@@ -1,0 +1,183 @@
+{% extends 'admin_dashboard_page.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+<link rel="stylesheet" href="{% static 'css/create_poll.css'%}"/>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<div id="add_voters_main_content" style="background-color: #e2e2e2">
+<h1>Add Candidate</h1>
+    <form method="post" id="candidate_form">
+        {%csrf_token%}
+        <div>
+            <div class="col-3">
+                {{form.name|as_crispy_field}}
+            </div>
+            <div class="col-3">
+                {{form.state|as_crispy_field}}
+            </div>
+            <div class="col-3">
+                {{form.district|as_crispy_field}}
+            </div>
+            <div class="col-3">
+                {{form.legislative|as_crispy_field}}
+            </div>
+            <div class="col-3">
+                {{form.candidate_image|as_crispy_field}}  <img id="uploaded_img" src="{% static 'img/profile.png'%}"/>
+            </div>
+            <div class="col-3">
+                {{form.candidate_symbol|as_crispy_field}} <img id="uploaded_symbol" src="{% static 'img/img.png'%}"/>
+            </div>
+             <div class="col-3">
+                 <p></p>
+            <button type="submit" value="submit" class="btn btn-success" id="add_voter_to_db">Save person</button>
+        </div>
+        </div>
+
+    </form>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+       function profile(input){
+        if (input.files && input.files[0]){
+            var reader = new FileReader();
+            reader.onload = function (e){
+                $("#uploaded_img").attr('src',e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#id_candidate_image").change(function () {
+        profile(this);
+    })
+</script>
+<script>
+       function readURL(input){
+        if (input.files && input.files[0]){
+            var reader = new FileReader();
+            reader.onload = function (e){
+                $("#uploaded_symbol").attr('src',e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#id_candidate_symbol").change(function () {
+        readURL(this);
+    })
+</script>
+<script>
+    $(document).ready(function () {
+        $("#id_district, #id_legislative").prop("disabled",true)
+    })
+    $("#id_state").on("click",function () {
+        $('#id_district').find('option').remove();
+        $.ajax({
+            url:"{% url 'state_submission'%}",
+            type:"POST",
+            data:{
+                state:$(this).find(":selected").text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success:function (data){
+                console.log(data.district)
+                $("#id_district").prop("disabled",false);
+                for(var i =0;i<data.district.length;i++){
+                    var select = document.getElementById("id_district");
+                    var option = document.createElement("option");
+                    option.text = data.district[i];
+
+                    select.add(option);
+
+                }
+
+
+            },
+            failure(){
+                alert("Failure");
+            }
+        })
+    })
+</script>
+<script>
+    $("#id_district").on("click",function () {
+        $('#id_legislative').find('option').remove();
+        $.ajax({
+            url:"{% url 'district_submission'%}",
+            type:"POST",
+            data:{
+                district:$("#id_district").find(":selected").text(),
+                csrfmiddlewaretoken:'{{csrf_token}}',
+                dataType:'json',
+            },success:function (data) {
+                $("#id_legislative").prop("disabled",false);
+                for(var i =0;i<data.legislative.length;i++){
+                    var select = document.getElementById("id_legislative");
+                    var option = document.createElement("option");
+                    option.text = data.legislative[i];
+
+                    select.add(option);
+
+                }
+            },
+            failure:function () {
+
+            }
+
+        })
+    })
+</script>
+<script>
+    $("#candidate_form").on("submit", function (e) {
+        e.preventDefault();
+        $.ajax({
+            type:"POST",
+            url:'{% url "add_candidate" %}',
+            data:new FormData(this),
+            contentType:false,
+            cache:false,
+            processData:false,
+            success:function (data) {
+                if(data.msg=="success"){
+
+                    $("#uploaded_img").attr("src","{% static 'img/profile.png'%}")
+                    $("#uploaded_symbol").attr("src","{% static 'img/img.png'%}")
+
+
+                    $('#candidate_form').trigger("reset")
+
+                }
+                else{
+                    alert("Cannot Add Candidate")
+                }
+            },
+            failure:function () {
+                alert("Cannot Add Candidate")
+            }
+        })
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

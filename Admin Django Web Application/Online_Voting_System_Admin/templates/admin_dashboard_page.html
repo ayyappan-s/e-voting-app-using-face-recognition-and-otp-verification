@@ -1,0 +1,87 @@
+<html>
+  <head>
+      {% load static%}
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css'%}">
+      <link rel="stylesheet" href="{% static 'css/add_voters.css'%}">
+  </head>
+  <body><div class="area" style="background-color: #e2e2e2" >
+      {% block content %}
+      {% endblock %}
+  </div><div class="navbar_container" style="height:100%;position:fixed"><nav class="main-menu" >
+            <ul>
+                <li>
+                    <a href="{% url 'dashboard'%}">
+                        <i class="fa  fa-2x"><img src="{%static 'img/home.png'%}" class="icon_dash"></i>
+                        <span class="nav-text">
+                            Dashboard
+                        </span>
+                    </a>
+
+                </li>
+                <li class="has-subnav">
+                    <a href="{% url 'create_poll'%}">
+                        <i class="fa  fa-2x"><img src="{%static 'img/plus.png'%}" class="icon_dash"></i>
+                        <span class="nav-text">
+                            Add Candidate
+                        </span>
+                    </a>
+
+                </li>
+                <li class="has-subnav">
+                    <a href="{% url 'add_voters'%}">
+                       <i class="fa  fa-2x"><img src="{%static 'img/addvoter.png'%}" class="icon_dash"></i>
+                        <span class="nav-text">
+                            Add Voters
+                        </span>
+                    </a>
+
+                </li>
+                <li class="has-subnav">
+                    <a href="{% url 'results'%}">
+                       <i class="fa  fa-2x"><img src="{%static 'img/results.png'%}" class="icon_dash"></i>
+                        <span class="nav-text">
+                            Results
+                        </span>
+                    </a>
+                 </li>
+
+            </ul>
+
+            <ul class="logout" id="logout">
+                <li>
+                   <a href="#">
+                         <i class="fa fa-power-off fa-2x"></i>
+                        <span class="nav-text" >
+                            Logout
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </nav></div>
+  </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $("#logout").on("click",function (e) {
+        $.ajax(
+            {
+                url:'{%url 'logout'%}',
+                type:"GET",
+                success: function (result) {
+                    if(result.msg=='success'){
+                    window.location.href='{%url 'login'%}';
+                    }
+                    else{
+                        alert("Error Occured! Cannot Log Out")
+                    }
+
+                },
+                error:function (error) {
+                    alert("Error ! cannot Log Out")
+                }
+            }
+        )
+
+    })
+</script>
+    </html>

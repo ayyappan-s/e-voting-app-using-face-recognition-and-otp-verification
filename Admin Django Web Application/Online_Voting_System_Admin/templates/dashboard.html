@@ -1,0 +1,768 @@
+{% extends 'admin_dashboard_page.html' %}
+{% block content %}
+{%load static%}
+{%load crispy_forms_tags%}
+
+<link rel="stylesheet" href="{% static 'css/dashboard_content.css'%}"/>
+<link rel="stylesheet" href="{% static 'css/dashboard.css'%}"/>
+<link rel="stylesheet" href="{% static 'css/tabstyle.css'%}"/>
+<div class="tab">
+    <button class="tablinks active" onclick="openCity(event, 'London')">Poll Control Panel</button>
+    <button class="tablinks" onclick="openCity(event, 'Paris');viewActivePolls();">View Active Polls</button>
+    <button class="tablinks" onclick="openCity(event, 'Tokyo');viewEndedPolls();">View Ended Polls</button>
+</div>
+
+<!-- Tab content -->
+<div id="London" class="tabcontent active " style="display: block">
+    <div id="dashboard_main_content" style="background-color: #e2e2e2">
+
+        <form method="post" id="pollform">
+            {%csrf_token%}
+
+            <div class="col-3">
+                {{ forms.state|as_crispy_field }}
+            </div>
+            <div class="col-3">
+                {{forms.district|as_crispy_field}}
+            </div>
+            <div class="col-3">
+                {{forms.legislative|as_crispy_field}}
+
+            </div>
+            <div class="col-3">
+                <button type="submit" value="submit" class="btn btn-primary" id="checkCandidate">Check Candidate</button>
+                <button type="click" value="0" class="btn btn-primary" id="startpoll">START POLL</button>
+            </div>
+        </form>
+
+        <div id="candidate_list">
+            <table border="1px" id="candidatecheck">
+                <tr>
+                    <th>Candidate Name</th>
+                    <th>Candidate Image</th>
+                    <th>Candidate Symbol</th>
+                    <th>Action</th>
+                </tr>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div id="Paris" class="tabcontent">
+    <h3>Currently Active Polls</h3>
+    <div id="activepolls">
+
+    </div>
+</div>
+
+<div id="Tokyo" class="tabcontent">
+    <h3>Ended Polls</h3>
+    <div id="endedpolls">
+
+    </div>
+</div>
+
+<div id="editform">
+    <form id="candidate_detail">
+        <h1>Edit Candidate Details</h1>
+        <label for="editState"><b>State</b></label>
+        <br>
+        <select id="editState" disabled="true"></select>
+        <br>
+        <label for="editDistrict"><b>District</b></label>
+        <br>
+        <select id="editDistrict" disabled="true"></select>
+        <br>
+        <label for="editLegislative"><b>Legislative</b></label>
+        <br>
+        <select id="editLegislative" disabled="true"></select>
+        <br>
+        <label for="editName"><b>Name</b></label>
+        <br>
+        <input type="text" id="editName" disabled="true">
+        <br>
+        <label for="editImage">Profile Image</label>
+        <br>
+        <img id="editImage"><input type="file" name="image" accept="image/*"  required="" id="select_edit_image">
+        <br>
+        <label for="editSymbol">Symbol</label>
+        <br>
+        <img id="editSymbol"><input type="file" name="image" accept="image/*"  required="" id="select_edit_symbol">
+    </form>
+    <button id="saveCandidate" class="btn btn-success" onclick="saveData()">&nbsp;Save&nbsp;</button>
+    <button id="deleteCandidate" class="btn btn-danger" onclick="deleteCandidate()">Delete</button>
+    <button id="cancel" class="btn btn-primary" onclick="closeForm()">Cancel</button>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script>
+
+    function profile(input){
+        if (input.files && input.files[0]){
+        var reader = new FileReader();
+        reader.onload = function (e){
+        $("#editImage").attr('src',e.target.result);
+    }
+        reader.readAsDataURL(input.files[0]);
+    }
+    }
+        $("#select_edit_image").change(function () {
+        profile(this);
+    })
+</script>
+<script>
+    function openCity(evt, cityName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
+<script>
+    function readURL(input){
+        if (input.files && input.files[0]){
+            var reader = new FileReader();
+            reader.onload = function (e){
+                $("#editSymbol").attr('src',e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#select_edit_symbol").change(function () {
+        readURL(this);
+    })
+</script>
+
+<script>
+$("#startpoll").on("click", function () {
+    if($("#startpoll").html()==="END POLL"){
+      console.log("END POLL RUNNING")
+        $.ajax(
+            {
+                url: '{% url "endpoll"%}',
+                type: 'POST',
+                data: {
+                    state: $("#id_state").val(),
+                    district: $("#id_district").val(),
+                    legislative: $("#id_legislative").val(),
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    dataType: 'json',
+                },
+                success: function (data) {
+                    if(data.msg==="success"){
+                        $("#startpoll").html("Start Poll")
+                    }
+                    else{
+                        alert("Cannot End Poll")
+                    }
+
+                },
+                failure: function () {
+                    alert("Check Internet connection")
+                }
+            }
+        )
+    }else{ console.log("Start Poll Running")
+        $.ajax(
+            {
+
+                url: '{% url "startpoll"%}',
+                type: 'POST',
+                data: {
+                    state: $("#id_state").val(),
+                    district: $("#id_district").val(),
+                    legislative: $("#id_legislative").val(),
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    dataType: 'json',
+                },
+                success: function (data) {
+                    $("#startpoll").html("END POLL")
+                },
+                failure: function () {
+                    alert("Check Internet connection")
+                }
+            }
+        )
+    }
+
+    })
+</script>
+<script>
+    $(document).ready(function () {
+        $("#id_district, #id_legislative").prop("disabled", true)
+        $("table,#candidate_edit_form").hide();
+        document.getElementById("editform").style.display = "none";
+    });
+    $('#id_state').on("click", function () {
+        console.log("RUnning")
+        $('#id_district').find('option').remove();
+        $.ajax({
+            url: "{% url 'state_submission'%}",
+            type: "POST",
+            data: {
+                state: $(this).find(":selected").text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success: function (data) {
+                console.log(data.district)
+                $("#id_district").prop("disabled", false);
+                for (var i = 0; i < data.district.length; i++) {
+                    var select = document.getElementById("id_district");
+                    var option = document.createElement("option");
+                    option.text = data.district[i];
+
+                    select.add(option);
+
+                }
+
+
+            },
+            failure() {
+                alert("Failure");
+            }
+        })
+    })
+</script>
+<script>
+    $("#id_district").on("click", function () {
+        $('#id_legislative').find('option').remove();
+        $.ajax({
+            url: "{% url 'district_submission'%}",
+            type: "POST",
+            data: {
+                district: $("#id_district").find(":selected").text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            }, success: function (data) {
+                $("#id_legislative").prop("disabled", false);
+                for (var i = 0; i < data.legislative.length; i++) {
+                    var select = document.getElementById("id_legislative");
+                    var option = document.createElement("option");
+                    option.text = data.legislative[i];
+
+                    select.add(option);
+
+                }
+            },
+            failure: function () {
+
+            }
+
+        })
+    })
+</script>
+<script>
+    $("#pollform").on("submit", function (e) {
+        $("#candidate_edit_form").show();
+        $("tbody").children().remove()
+        console.log("availability checker");
+        e.preventDefault();
+        $.ajax({
+            url: '{%url "availability_checker"%}',
+            type: 'POST',
+            cache: false,
+            data: {
+                state: $("#id_state").find(":selected").text(),
+                district: $("#id_district").find(":selected").text(),
+                legislative: $("#id_legislative").find(":selected").text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success: function (data) {
+
+
+                // for (key in data.k){
+                //     $("table").append("<tr id='"+key+"'></tr>")
+                //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_image_url']+"></td>")
+                //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_symbol_url']+"></td>")
+                //     $("#"+key).append("<td><button onclick='candidate_action(this.id)' id='"+key+"' class='btn btn-info'>Edit/Delete</button></td>")
+                //
+                //     console.log(data[data.k[key]])
+                // }
+                $("table").show();
+                console.log(data.k)
+                data.k.forEach(tableappender);
+
+                function tableappender(key, index) {
+                    $("#candidatecheck").append("<tr id='" + key.replaceAll(/\s/g,'') + "'></tr>")
+                    $("#" + key.replaceAll(/\s/g,'')).append("<td>" + key + "</td>")
+                    $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                    $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url'] + "></td>")
+                    $("#" + key.replaceAll(/\s/g,'')).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index].replaceAll(/\s/g,'') + "' class='btn btn-info'>Edit/Delete</button></td>")
+                }
+
+
+            },
+            failure: function () {
+                alert("Unable to Load Data")
+            }
+        })
+    })
+
+</script>
+
+<script>
+    function candidate_action(id) {
+        $('#editState').find('option').remove();
+        $('#editDistrict').find('option').remove();
+        $('#editLegislative').find('option').remove();
+        document.getElementById("editform").style.display = "block";
+        console.log("Called");
+        $('#editDistrict').find('option').remove();
+        $.ajax({
+            url: "{% url 'state_submission'%}",
+            type: "POST",
+
+            data: {
+                state: $("#id_state").find(":selected").text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success: function (data) {
+                console.log(data.district)
+
+                for (var i = 0; i < data.district.length; i++) {
+                    var select = document.getElementById("editDistrict");
+                    var option = document.createElement("option");
+                    option.text = data.district[i];
+
+                    select.add(option);
+
+                }
+
+                console.log("District Called");
+                $('#editLegislative').find('option').remove();
+                $.ajax({
+                    url: "{% url 'district_submission'%}",
+                    type: "POST",
+                    data: {
+                        district: $("#id_district").find(":selected").text(),
+                        csrfmiddlewaretoken: '{{csrf_token}}',
+                        dataType: 'json',
+                    }, success: function (data) {
+
+                        for (var i = 0; i < data.legislative.length; i++) {
+                            var select = document.getElementById("editLegislative");
+                            var option = document.createElement("option");
+                            option.text = data.legislative[i];
+
+                            select.add(option);
+
+                        }
+                        console.log("Legislative Called");
+                        $.ajax({
+                            url: "{% url 'state_adder'%}",
+                            type: 'POST',
+                            data: {
+                                csrfmiddlewaretoken: '{{csrf_token}}',
+                                dataType: 'json',
+                            },
+                            success: function (data) {
+                                for (var i = 0; i < data.state.length; i++) {
+                                    var select = document.getElementById("editState")
+                                    var option = document.createElement("option");
+                                    option.text = data.state[i][1];
+
+                                    select.add(option);
+                                }
+                                state = $("#id_state").find(":selected").text()
+                                console.log(state)
+                                console.log("hi")
+                                legislative = $("#id_legislative").find(":selected").text()
+                                $(editLegislative).val(legislative);
+                                $(editName).val(id)
+                                $(editState).val(state)
+                                district = $("#id_district").find(":selected").text()
+                                console.log(district)
+                                console.log(legislative)
+                                $(editDistrict).val(district)
+
+                                console.log(legislative)
+
+                                console.log("Im called")
+
+
+                            },
+                            failure: function () {
+                                alert("failure")
+                            }
+                        })
+                    },
+                    failure: function () {
+
+                    }
+
+                })
+                $("#editImage").attr("src", $("#" + id.replaceAll(/\s/g,'')).find(".candprofile").attr("src"))
+                $("#editSymbol").attr("src", $("#" + id.replaceAll(/\s/g,'')).find(".candsymbol").attr("src"))
+
+            },
+            failure() {
+                alert("Failure");
+            }
+        })
+
+
+        console.log(id)
+        console.log($(id).find(".candprofile").attr("src"))
+
+    }
+</script>
+
+<script>
+    function closeForm() {
+        document.getElementById("editform").style.display = "none";
+    }
+</script>
+<script>
+    function deleteCandidate() {
+        $.ajax({
+            url:'{% url "deleteCandidate"%}',
+            type: "POST",
+            data: {
+                state:$("#editState").find(":selected").text(),
+                district:$("#editDistrict").find(":selected").text(),
+                legislative:$("#editLegislative").find(":selected").text(),
+                name:$("#editName").val(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success:function (data) {
+                if (data.result==="success"){
+                    $("#candidate_edit_form").show();
+                    $("tbody").children().remove()
+                    console.log("availability checker");
+
+                    $.ajax({
+                        url: '{%url "availability_checker"%}',
+                        type: 'POST',
+                        cache:false,
+                        data: {
+                            state: $("#id_state").find(":selected").text(),
+                            district: $("#id_district").find(":selected").text(),
+                            legislative: $("#id_legislative").find(":selected").text(),
+                            csrfmiddlewaretoken: '{{csrf_token}}',
+                            dataType: 'json',
+                        },
+                        success: function (data) {
+
+                            // for (key in data.k){
+                            //     $("table").append("<tr id='"+key+"'></tr>")
+                            //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_image_url']+"></td>")
+                            //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_symbol_url']+"></td>")
+                            //     $("#"+key).append("<td><button onclick='candidate_action(this.id)' id='"+key+"' class='btn btn-info'>Edit/Delete</button></td>")
+                            //
+                            //     console.log(data[data.k[key]])
+                            // }
+                            $("table").show();
+                            console.log(data.k)
+                            data.k.forEach(tableappender);
+
+                            function tableappender(key, index) {
+                                $("#candidatecheck").append("<tr id='" + key.replaceAll(/\s/g,'') + "'></tr>")
+                                $("#" + key.replaceAll(/\s/g,'')).append("<td>" + key + "</td>")
+                                $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                                $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url'] + "></td>")
+                                $("#" + key.replaceAll(/\s/g,'')).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index].replaceAll(/\s/g,'') + "' class='btn btn-info'>Edit/Delete</button></td>")
+                            }
+
+
+                        },
+                        failure: function () {
+                            alert("Unable to Load Data")
+                        }
+                    })
+                    closeForm();
+                }
+                else{
+                    alert("Error Occured")
+                }
+            }
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+</script>
+<script>
+    function saveData() {
+        formdata=new FormData();
+       file = $("#select_edit_image")[0].files[0]
+       file2 = $("#select_edit_symbol")[0].files[0]
+        if(formdata){
+            formdata.append("candidate_image",file);
+            formdata.append("candidate_symbol",file2);
+            formdata.append("name",$("#editName").val());
+            formdata.append("state",$("#editState").find(":selected").text());
+            formdata.append("district",$("#editDistrict").find(":selected").text());
+            formdata.append("legislative",$("#editLegislative").find(":selected").text());
+            formdata.append("csrfmiddlewaretoken", '{{csrf_token}}')
+            $.ajax({
+                type:"POST",
+                url:'{% url "add_candidate" %}',
+                data:formdata,
+                contentType:false,
+                cache:false,
+                processData:false,
+                success:function (data) {
+                    if(data.msg==="success"){
+
+                        $("#candidate_edit_form").show();
+                        $("tbody").children().remove()
+                        console.log("availability_checker")
+                        $.ajax({
+
+                            url: '{%url "availability_checker"%}',
+                            type: 'POST',
+                            data: {
+                                state: $("#id_state").find(":selected").text(),
+                                district: $("#id_district").find(":selected").text(),
+                                legislative: $("#id_legislative").find(":selected").text(),
+                                csrfmiddlewaretoken: '{{csrf_token}}',
+                                dataType: 'json',
+                            },
+                            success: function (data) {
+
+                                // for (key in data.k){
+                                //     $("table").append("<tr id='"+key+"'></tr>")
+                                //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_image_url']+"></td>")
+                                //     $("#"+key).append("<td><img id='candimg' src="+data[data.k[key]]['candidate_symbol_url']+"></td>")
+                                //     $("#"+key).append("<td><button onclick='candidate_action(this.id)' id='"+key+"' class='btn btn-info'>Edit/Delete</button></td>")
+                                //
+                                //     console.log(data[data.k[key]])
+                                // }
+                                $("table").show();
+                                console.log(data.k)
+                                data.k.forEach(tableappender);
+
+                                function tableappender(key, index) {
+                                    $("#candidatecheck").append("<tr id='" + key.replaceAll(/\s/g,'') + "'></tr>")
+                                    $("#" + key.replaceAll(/\s/g,'')).append("<td>" + key + "</td>")
+                                    $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                                    $("#" + key.replaceAll(/\s/g,'')).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url']+ "></td>")
+                                    $("#" + key.replaceAll(/\s/g,'')).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index].replaceAll(/\s/g,'') + "' class='btn btn-info'>Edit/Delete</button></td>")
+                                }
+
+
+                            },
+                            failure: function () {
+                                alert("Unable to Load Data")
+                            }
+                        })
+                        closeForm()
+                        window.location.reload();
+                    }
+                    else{
+                        alert("Cannot Save Changes")
+                    }
+                },
+                failure:function () {
+                    alert("Cannot Save Changes")
+                }
+
+            })
+        }
+
+    }
+
+</script>
+<script>
+    function viewActivePolls() {
+        $.ajax({
+            url:'{% url "viewactivepoll"%}',
+            type:'POST',
+            data:{
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success:function (data) {
+                $("table").show();
+
+                $("#activepolls").empty()
+                console.log(data)
+                $("#activepolls").append("<table style='float:left'>" +
+                    "<tbody id='state'>" +
+                    "<tr>" +
+                    "<th>State</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#activepolls").append("<table style='float:left'>" +
+                    "<tbody id='district'>" +
+                    "<tr>" +
+                    "<th>District</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#activepolls").append("<table style='float:left'>" +
+                    "<tbody id='legislative'>" +
+                    "<tr>" +
+                    "<th>Legislative</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#activepolls").append("<table style='float:left'>" +
+                    "<tbody id='candidate'>" +
+                    "<tr>" +
+                    "<th>Candidate</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                for(key in data.k){
+                   $("#state").append("<tr><td>"+key+"</td></tr>")
+                    for(val in data.k[key]){
+                        $("#district").append("<tr><td>"+val+"</td></tr>")
+                        for(leg in data.k[key][val]){
+                            $("#legislative").append("<tr><td>"+leg+"</td></tr>")
+                            for(can in data.k[key][val][leg]){
+                                $("#candidate").append("<tr><td>"+can+"</td></tr>")
+                            }
+                        }
+                    }
+                }
+                // data.k.forEach(tableappender);
+                //
+                // function tableappender(key, index) {
+                //     $("#polltable").append("<tr id='" + key + "'></tr>")
+                //     $("#" + key).append("<td>" + data[index] + "</td>")
+                //     // $("#" + key).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                //     // $("#" + key).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url']+ "></td>")
+                //     // $("#" + key).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index] + "' class='btn btn-info'>Edit/Delete</button></td>")
+                // }
+            }
+        })
+    }
+</script>
+<script>
+    $("#id_legislative").on("click",function () {
+        $.ajax({
+            url:'{% url "check_poll_status"%}',
+            type:"POST",
+            data:{
+                state: $("#id_state").val(),
+                district: $("#id_district").val(),
+                legislative: $("#id_legislative").val(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success: function (data) {
+                console.log(data.msg)
+                if(data.msg==="running"){
+                    $("#startpoll").html("END POLL")
+                }
+                else{
+                    $("#startpoll").html("START POLL")
+                }
+            }
+
+        })
+    })
+</script>
+<script>
+    function viewEndedPolls() {
+        $.ajax({
+            url:'{% url "viewendedpoll"%}',
+            type:'POST',
+            data:{
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                dataType: 'json',
+            },
+            success:function (data) {
+                $("table").show();
+
+                $("#endedpolls").empty()
+                console.log(data)
+                $("#endedpolls").append("<table style='float:left'>" +
+                    "<tbody id='estate'>" +
+                    "<tr>" +
+                    "<th>State</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#endedpolls").append("<table style='float:left'>" +
+                    "<tbody id='edistrict'>" +
+                    "<tr>" +
+                    "<th>District</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#endedpolls").append("<table style='float:left'>" +
+                    "<tbody id='elegislative'>" +
+                    "<tr>" +
+                    "<th>Legislative</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                $("#endedpolls").append("<table style='float:left'>" +
+                    "<tbody id='ecandidate'>" +
+                    "<tr>" +
+                    "<th>Candidate</th>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table>")
+                for(key in data.k){
+                    $("#estate").append("<tr><td>"+key+"</td></tr>")
+                    for(val in data.k[key]){
+                        $("#edistrict").append("<tr><td>"+val+"</td></tr>")
+                        for(leg in data.k[key][val]){
+                            $("#elegislative").append("<tr><td>"+leg+"</td></tr>")
+                            for(can in data.k[key][val][leg]){
+                                $("#ecandidate").append("<tr><td>"+can+"</td></tr>")
+                            }
+                        }
+                    }
+                }
+                // data.k.forEach(tableappender);
+                //
+                // function tableappender(key, index) {
+                //     $("#polltable").append("<tr id='" + key + "'></tr>")
+                //     $("#" + key).append("<td>" + data[index] + "</td>")
+                //     // $("#" + key).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                //     // $("#" + key).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url']+ "></td>")
+                //     // $("#" + key).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index] + "' class='btn btn-info'>Edit/Delete</button></td>")
+                // }
+            }
+        })
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'admin_dashboard_page.html' %}
+{% block content %}
+{%load static%}
+<link rel="stylesheet" href="{% static 'css/results.css'%}"/>
+<div id="results" class="results_main_content">
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+
+
+<script>
+    $(document).ready(
+        function () {
+            $.ajax({
+                url:'{% url "resultsofpolls"%}',
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    dataType: 'json',
+                },
+                success:function (data) {
+                    $("table").show();
+
+                    $("#results").empty()
+                    console.log(data)
+                    $("#results").append("<table style='float:left' border='1px black solid'>" +
+                        "<tbody id='estate'>" +
+                        "<tr>" +
+                        "<th>State</th>" +
+                        "</tr>" +
+                        "</tbody>" +
+                        "</table>")
+                    $("#results").append("<table style='float:left' border='1px black solid'>" +
+                        "<tbody id='edistrict'>" +
+                        "<tr>" +
+                        "<th>District</th>" +
+                        "</tr>" +
+                        "</tbody>" +
+                        "</table>")
+                    $("#results").append("<table style='float:left' border='1px black solid'>" +
+                        "<tbody id='elegislative'>" +
+                        "<tr>" +
+                        "<th>Legislative</th>" +
+                        "</tr>" +
+                        "</tbody>" +
+                        "</table>")
+                    $("#results").append("<table style='float:left' border='1px black solid'>" +
+                        "<tbody id='ecandidate'>" +
+                        "<tr>" +
+                        "<th>Candidate</th>" +
+                        "</tr>" +
+                        "</tbody>" +
+                        "</table>")
+                    $("#results").append("<table style='float:left' border='1px black solid'>" +
+                        "<tbody id='evotes'>" +
+                        "<tr>" +
+                        "<th>Votes</th>" +
+                        "</tr>" +
+                        "</tbody>" +
+                        "</table>")
+                    for(key in data.k){
+                        $("#estate").append("<tr><td>"+key+"</td></tr>")
+                        for(val in data.k[key]){
+                            $("#edistrict").append("<tr><td>"+val+"</td></tr>")
+                            for(leg in data.k[key][val]){
+                                $("#elegislative").append("<tr><td>"+leg+"</td></tr>")
+                                for(can in data.k[key][val][leg]){
+                                    $("#ecandidate").append("<tr><td>"+can+"</td></tr>")
+                                }
+                                for(vot in data.k[key][val][leg]){
+                                    $("#evotes").append("<tr><td>"+data.k[key][val][leg][vot]+"</td></tr>")
+                                }
+                            }
+                        }
+                    }
+                    // data.k.forEach(tableappender);
+                    //
+                    // function tableappender(key, index) {
+                    //     $("#polltable").append("<tr id='" + key + "'></tr>")
+                    //     $("#" + key).append("<td>" + data[index] + "</td>")
+                    //     // $("#" + key).append("<td><img id='candimg' class='candprofile' src=" + data[key]['candidate_image_url'] + "></td>")
+                    //     // $("#" + key).append("<td><img id='candimg' class='candsymbol' src=" + data[key]['candidate_symbol_url']+ "></td>")
+                    //     // $("#" + key).append("<td><button onclick='candidate_action(this.id)' id='" + data['keys'][index] + "' class='btn btn-info'>Edit/Delete</button></td>")
+                    // }
+                }
+            })
+        }
+    )
+
+</script>
+{% endblock %}
